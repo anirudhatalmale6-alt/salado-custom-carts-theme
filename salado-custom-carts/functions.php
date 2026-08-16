@@ -20,6 +20,8 @@ function scc_detail( $key ) {
 	$defaults = array(
 		'phone'         => '512-814-6750',
 		'email'         => 'sales@SaladoCustomCarts.com',
+		// Service and repair bookings go to Andrew, not the general sales inbox.
+		'service_email' => 'andreew@saladocustomcarts.com',
 		'town'          => 'Salado, Texas',
 		'hours'         => 'Mon - Sat by appointment',
 		'pickup_note'   => 'FREE local cart pickup and delivery',
@@ -33,6 +35,38 @@ function scc_detail( $key ) {
 /** Phone stripped to digits, for tel: links. */
 function scc_phone_link() {
 	return preg_replace( '/[^0-9+]/', '', scc_detail( 'phone' ) );
+}
+
+/**
+ * The "Schedule Your Service" link. A mailto with the subject and the questions
+ * already filled in, so the customer just adds their answers and hits send -
+ * and the reply lands with enough detail to actually book the job.
+ */
+function scc_service_link() {
+	$body = implode(
+		"\r\n",
+		array(
+			'What the cart is doing (or what you want done):',
+			'',
+			'Cart make and model:',
+			'',
+			'Battery type, if you know it:',
+			'',
+			'Your name and phone:',
+			'',
+			'Your address, if you would like us to collect it:',
+			'',
+		)
+	);
+
+	// The address itself is left as-is - percent-encoding the @ is legal but some
+	// mail clients handle it badly. Only the subject and body are encoded.
+	return sprintf(
+		'mailto:%s?subject=%s&body=%s',
+		sanitize_email( scc_detail( 'service_email' ) ),
+		rawurlencode( 'Service request' ),
+		rawurlencode( $body )
+	);
 }
 
 function scc_setup() {

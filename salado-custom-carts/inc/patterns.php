@@ -27,6 +27,7 @@ function scc_home_blocks() {
 	$lithium = scc_img( 'lithium-pack.jpg' );
 	$phone   = scc_detail( 'phone' );
 	$tel     = scc_phone_link();
+	$service = scc_service_link();
 
 	$blocks = array();
 
@@ -52,7 +53,7 @@ function scc_home_blocks() {
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline","textColor":"white"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="/carts-for-sale/">Browse carts for sale</a></div>
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="' . esc_url( $service ) . '">Schedule Your Service</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
@@ -199,7 +200,7 @@ function scc_home_blocks() {
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Whether it is more range, more speed, a lift and bigger tires, or a full custom build from a used cart &mdash; give us a call and we will talk it through honestly.</p>
+<p>Whether it is a repair, a service, more range, more speed, a lift and bigger tires, or a full custom build from a used cart &mdash; give us a call and we will talk it through honestly.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:buttons -->
@@ -209,7 +210,7 @@ function scc_home_blocks() {
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline","textColor":"white"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="/contact/">Send a message</a></div>
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="' . esc_url( $service ) . '">Schedule Your Service</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
