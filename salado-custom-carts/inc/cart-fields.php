@@ -46,6 +46,75 @@ function scc_register_cart_meta() {
 }
 add_action( 'init', 'scc_register_cart_meta' );
 
+/**
+ * A REST field for the cart details.
+ *
+ * The detail fields are stored under keys beginning with an underscore, which
+ * keeps them out of the Custom Fields box in the editor. WordPress treats those
+ * as protected meta and strips them from the REST API entirely - registering
+ * them with show_in_rest is not enough. So the details get their own explicit
+ * REST field, which reads and writes the same meta.
+ *
+ * Lets carts be created and updated from outside the dashboard - bulk imports,
+ * migrations, a phone app later - without loosening protection on the meta.
+ */
+function scc_register_cart_rest_field() {
+	register_rest_field( 'scc_cart', 'cart_details', array(
+		'get_callback'    => 'scc_rest_get_cart_details',
+		'update_callback' => 'scc_rest_update_cart_details',
+		'schema'          => array(
+			'description' => __( 'Cart detail fields (status, price, year, make, model, battery, seats, features).', 'salado-custom-carts' ),
+			'type'        => 'object',
+			'context'     => array( 'view', 'edit' ),
+		),
+	) );
+}
+add_action( 'rest_api_init', 'scc_register_cart_rest_field' );
+
+function scc_rest_get_cart_details( $post ) {
+	$out = array( 'status' => scc_cart_status( $post['id'] ) );
+
+	foreach ( array_keys( scc_cart_field_map() ) as $key ) {
+		$out[ ltrim( str_replace( 'scc_', '', $key ), '_' ) ] = (string) get_post_meta( $post['id'], $key, true );
+	}
+
+	return $out;
+}
+
+function scc_rest_update_cart_details( $value, $post ) {
+	if ( ! is_array( $value ) ) {
+		return new WP_Error( 'scc_bad_details', __( 'cart_details must be an object.', 'salado-custom-carts' ), array( 'status' => 400 ) );
+	}
+	if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+		return new WP_Error( 'scc_forbidden', __( 'You cannot edit this cart.', 'salado-custom-carts' ), array( 'status' => 403 ) );
+	}
+
+	$fields = scc_cart_field_map();
+
+	foreach ( $value as $name => $raw ) {
+		if ( 'status' === $name ) {
+			$statuses = scc_cart_statuses();
+			$status   = sanitize_key( $raw );
+			update_post_meta( $post->ID, '_scc_status', isset( $statuses[ $status ] ) ? $status : 'available' );
+			continue;
+		}
+
+		$key = '_scc_' . sanitize_key( $name );
+		if ( ! isset( $fields[ $key ] ) ) {
+			continue;
+		}
+
+		$clean = 'textarea' === $fields[ $key ]['type']
+			? sanitize_textarea_field( $raw )
+			: sanitize_text_field( $raw );
+		update_post_meta( $post->ID, $key, $clean );
+	}
+
+	scc_sync_status_order( $post->ID );
+
+	return true;
+}
+
 function scc_cart_meta_box() {
 	add_meta_box(
 		'scc_cart_details',
