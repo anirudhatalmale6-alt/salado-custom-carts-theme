@@ -1,0 +1,17 @@
+/*
+Theme Name: Salado Custom Carts
+Theme URI: https://saladocustomcarts.com/
+Author: Anirudha Talmale
+Description: Custom theme for Salado Custom Carts - a Salado, Texas golf cart builder. Informational catalogue site: carts are shown, never sold online. Block-editor native, no page builder required.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.8
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: salado-custom-carts
+Tags: business, custom-logo, custom-menu, block-styles, wide-blocks, responsive
+*/
+
+/* Styles live in assets/css/theme.css so this header file stays readable.
+   The child theme's style.css is the right place for your own tweaks. */

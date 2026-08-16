@@ -1,0 +1,202 @@
+/* ==========================================================================
+   Block-editor section styles.
+
+   Every homepage section is built from CORE WordPress blocks (Cover, Columns,
+   Media & Text, Buttons) carrying a theme class. That keeps the whole page
+   editable in the normal editor - no page builder, no custom block plugin -
+   while still looking designed. These rules are what turn the plain blocks
+   into the sections.
+   ========================================================================== */
+
+/* ------------------------------------------------------------ hero cover */
+.scc-hero-block.wp-block-cover {
+  min-height: clamp(430px, 62vh, 620px);
+  padding: clamp(2.5rem, 7vw, 5rem) 0;
+  align-items: center;
+}
+.scc-hero-block.wp-block-cover .wp-block-cover__background {
+  background: linear-gradient(
+    100deg,
+    rgba(8, 10, 13, 0.94) 0%,
+    rgba(8, 10, 13, 0.86) 38%,
+    rgba(8, 10, 13, 0.45) 68%,
+    rgba(8, 10, 13, 0.32) 100%
+  ) !important;
+  opacity: 1 !important;
+}
+.scc-hero-block .wp-block-cover__inner-container {
+  width: 100%;
+  max-width: var(--scc-max);
+  margin-inline: auto;
+  padding-inline: var(--scc-gutter);
+}
+.scc-hero-block .wp-block-cover__inner-container > * { max-width: 44rem; }
+.scc-hero-block h1 {
+  color: #fff;
+  margin-bottom: 0.3em;
+  text-wrap: balance;
+}
+.scc-hero-block h1 mark,
+.scc-hero-block h1 .scc-accent {
+  background: none;
+  color: var(--scc-red-accent);
+  display: block;
+}
+.scc-hero-block p { color: #dfe5ec; font-size: 1.15rem; max-width: 46ch; }
+.scc-hero-block .scc-eyebrow { color: var(--scc-red-accent); }
+
+/* --------------------------------------------------------- trust columns */
+.scc-trust-block.wp-block-columns {
+  background: var(--scc-ink-2);
+  gap: 0;
+  margin-block: 0;
+  padding: clamp(1.5rem, 3vw, 2.2rem) var(--scc-gutter);
+  max-width: none;
+}
+.scc-trust-block.wp-block-columns > .wp-block-column {
+  padding: 0.6rem clamp(0.9rem, 2vw, 1.6rem);
+  border-left: 3px solid var(--scc-red);
+  margin-inline: 0;
+}
+.scc-trust-block .wp-block-column + .wp-block-column { margin-left: clamp(1rem, 2.5vw, 2rem); }
+.scc-trust-block h3 {
+  color: #fff;
+  font-size: 1.05rem;
+  margin: 0 0 0.2rem;
+  line-height: 1.15;
+}
+.scc-trust-block p {
+  margin: 0;
+  color: var(--scc-on-dark-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------- generic section */
+.scc-block-section { padding-block: clamp(3rem, 7vw, 5.5rem); }
+.scc-block-section.has-scc-ink-background-color,
+.scc-block-section.has-scc-ink-2-background-color { color: var(--scc-on-dark); }
+.scc-block-section.has-scc-ink-background-color h2,
+.scc-block-section.has-scc-ink-background-color h3,
+.scc-block-section.has-scc-ink-2-background-color h2,
+.scc-block-section.has-scc-ink-2-background-color h3 { color: #fff; }
+.scc-block-section.has-scc-ink-background-color p,
+.scc-block-section.has-scc-ink-2-background-color p { color: var(--scc-on-dark-muted); }
+
+.scc-block-section > .wp-block-group__inner-container,
+.scc-block-section.is-layout-constrained > * {
+  max-width: var(--scc-max);
+  margin-inline: auto;
+  padding-inline: var(--scc-gutter);
+}
+
+/* --------------------------------------------------------- media & text  */
+.scc-mediatext.wp-block-media-text {
+  max-width: var(--scc-max);
+  margin-inline: auto;
+  padding-inline: var(--scc-gutter);
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+.scc-mediatext.wp-block-media-text > .wp-block-media-text__media img {
+  border-radius: var(--scc-radius-lg);
+  box-shadow: var(--scc-shadow);
+}
+.scc-mediatext.wp-block-media-text > .wp-block-media-text__content {
+  padding-inline: 0;
+}
+.scc-mediatext ul {
+  list-style: none;
+  margin: 1.3rem 0 1.6rem;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+.scc-mediatext ul li {
+  position: relative;
+  padding-left: 1.9rem;
+  font-weight: 500;
+}
+.scc-mediatext ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 12px;
+  height: 7px;
+  border-left: 2.5px solid var(--scc-red-accent);
+  border-bottom: 2.5px solid var(--scc-red-accent);
+  transform: rotate(-45deg);
+}
+.scc-mediatext--light ul li::before {
+  border-color: var(--scc-red);
+}
+
+/* --------------------------------------------------------------- pickup  */
+.scc-pickup-block { background: var(--scc-navy); color: #fff; }
+.scc-pickup-block h2 { color: #fff; }
+.scc-pickup-block p { color: #cdd8ea; }
+.scc-pickup-block .scc-eyebrow { color: #ff8fa0; }
+.scc-pickup-block ul li::before { border-color: #fff; }
+
+/* ----------------------------------------------------------------- CTA   */
+.scc-cta-block { text-align: center; }
+.scc-cta-block p { margin-inline: auto; max-width: 55ch; }
+.scc-cta-block .wp-block-buttons { justify-content: center; }
+
+/* --------------------------------------------------------------- buttons */
+.wp-block-button__link {
+  font-family: var(--scc-font-head);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1.08rem;
+  padding: 1.05rem 1.7rem;
+  border-radius: var(--scc-radius);
+  transition: background-color 0.18s ease, transform 0.18s ease, color 0.18s ease;
+}
+.wp-block-button__link:hover { transform: translateY(-2px); }
+.wp-block-button.is-style-outline .wp-block-button__link { border-width: 2px; }
+
+/* ------------------------------------------------------ section headings */
+.scc-eyebrow {
+  font-family: var(--scc-font-head);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.95rem !important;
+  font-weight: 700;
+  color: var(--scc-red);
+  margin: 0 0 0.5rem !important;
+}
+
+/* the carts shortcode sits inside a block section */
+.scc-block-section .scc-carts { margin-top: 2.4rem; }
+
+/* ------------------------------------------------------------- responsive */
+@media (max-width: 960px) {
+  .scc-trust-block.wp-block-columns { flex-wrap: wrap !important; }
+  .scc-trust-block.wp-block-columns > .wp-block-column {
+    flex-basis: calc(50% - 1rem) !important;
+    margin-left: 0 !important;
+    margin-bottom: 1.2rem;
+  }
+  .scc-mediatext.wp-block-media-text { grid-template-columns: 1fr; }
+  .scc-mediatext.wp-block-media-text > .wp-block-media-text__media { margin-bottom: 1.5rem; }
+}
+
+@media (max-width: 767px) {
+  .scc-hero-block.wp-block-cover { min-height: 0; }
+  .scc-hero-block.wp-block-cover .wp-block-cover__background {
+    background: linear-gradient(
+      180deg,
+      rgba(8, 10, 13, 0.82) 0%,
+      rgba(8, 10, 13, 0.9) 55%,
+      rgba(8, 10, 13, 0.95) 100%
+    ) !important;
+  }
+  .scc-hero-block .wp-block-buttons { width: 100%; }
+  .scc-hero-block .wp-block-button { width: 100%; }
+  .scc-hero-block .wp-block-button__link { width: 100%; }
+  .scc-trust-block.wp-block-columns > .wp-block-column { flex-basis: 100% !important; }
+}
