@@ -96,8 +96,16 @@ function scc_carts_shortcode( $atts ) {
 
 	$query = new WP_Query( $args );
 
+	// Stock runs out. An empty grid would leave a heading floating over a gap, so
+	// say something useful instead and keep the call to action alive.
 	if ( ! $query->have_posts() ) {
-		return '';
+		return sprintf(
+			'<div class="scc-empty"><p class="scc-empty__title">%s</p><p class="scc-empty__text">%s</p><a class="scc-btn scc-btn--primary" href="tel:%s">%s</a></div>',
+			esc_html__( 'Nothing in stock this minute', 'salado-custom-carts' ),
+			esc_html__( 'Carts move quickly. Tell us what you are after - budget, seats, lifted or standard - and we will find one and build it out for you.', 'salado-custom-carts' ),
+			esc_attr( scc_phone_link() ),
+			sprintf( esc_html__( 'Call %s', 'salado-custom-carts' ), esc_html( scc_detail( 'phone' ) ) )
+		);
 	}
 
 	$out = '<div class="scc-carts">';

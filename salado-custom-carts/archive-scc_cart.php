@@ -32,7 +32,13 @@ get_header();
 			</div>
 			<?php the_posts_pagination( array( 'mid_size' => 2 ) ); ?>
 		<?php else : ?>
-			<p><?php esc_html_e( 'No carts listed at the moment - give us a call and tell us what you are after.', 'salado-custom-carts' ); ?></p>
+			<div class="scc-empty">
+				<p class="scc-empty__title"><?php esc_html_e( 'Nothing in stock this minute', 'salado-custom-carts' ); ?></p>
+				<p class="scc-empty__text"><?php esc_html_e( 'Carts move quickly. Tell us what you are after - budget, seats, lifted or standard - and we will find one and build it out for you.', 'salado-custom-carts' ); ?></p>
+				<a class="scc-btn scc-btn--primary" href="tel:<?php echo esc_attr( scc_phone_link() ); ?>">
+					<?php printf( esc_html__( 'Call %s', 'salado-custom-carts' ), esc_html( scc_detail( 'phone' ) ) ); ?>
+				</a>
+			</div>
 		<?php endif; ?>
 	</div>
 </section>

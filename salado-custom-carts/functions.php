@@ -21,7 +21,7 @@ function scc_detail( $key ) {
 		'phone'         => '512-814-6750',
 		'email'         => 'sales@SaladoCustomCarts.com',
 		// Service and repair bookings go to Andrew, not the general sales inbox.
-		'service_email' => 'andreew@saladocustomcarts.com',
+		'service_email' => 'andrew@saladocustomcarts.com',
 		'town'          => 'Salado, Texas',
 		'hours'         => 'Mon - Sat by appointment',
 		'pickup_note'   => 'FREE local cart pickup and delivery',
