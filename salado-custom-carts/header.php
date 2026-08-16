@@ -22,19 +22,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <a class="scc-skip" href="#scc-main"><?php esc_html_e( 'Skip to content', 'salado-custom-carts' ); ?></a>
 
-<div class="scc-topbar">
-	<div class="scc-container scc-topbar__inner">
-		<span class="scc-topbar__note">
-			<?php echo scc_icon( 'truck', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-			<?php echo esc_html( scc_detail( 'pickup_note' ) ); ?>
-		</span>
-		<span class="scc-topbar__links">
-			<a href="mailto:<?php echo esc_attr( scc_detail( 'email' ) ); ?>"><?php echo esc_html( scc_detail( 'email' ) ); ?></a>
-			<a href="tel:<?php echo esc_attr( scc_phone_link() ); ?>"><?php echo esc_html( scc_detail( 'phone' ) ); ?></a>
-		</span>
-	</div>
-</div>
-
 <header class="scc-header">
 	<div class="scc-container scc-header__inner">
 		<a class="scc-header__logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
@@ -43,6 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$logo_id = get_theme_mod( 'custom_logo' );
 				echo wp_get_attachment_image( $logo_id, 'full', false, array( 'alt' => get_bloginfo( 'name' ) ) );
 			} else {
+				// The logo already carries a white keyline around every shape, so it
+				// sits on the black bar without being recoloured.
 				printf(
 					'<img src="%s" width="900" height="453" alt="%s" />',
 					esc_url( get_template_directory_uri() . '/assets/img/logo.png' ),
@@ -66,7 +55,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="scc-header__actions">
 			<a class="scc-header__phone" href="tel:<?php echo esc_attr( scc_phone_link() ); ?>">
+				<?php echo scc_icon( 'phone', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<?php echo esc_html( scc_detail( 'phone' ) ); ?>
+			</a>
+			<a class="scc-header__cta" href="<?php echo esc_url( scc_service_link() ); ?>">
+				<?php esc_html_e( 'Schedule Service', 'salado-custom-carts' ); ?>
 			</a>
 			<button class="scc-burger" type="button" aria-expanded="false" aria-controls="scc-nav">
 				<span class="scc-burger__bars" aria-hidden="true"></span>

@@ -40,8 +40,8 @@
   --scc-font-head: "Barlow Condensed", "Arial Narrow", var(--scc-font);
 }
 
-/* This site is designed light-header/dark-sections. Declaring the scheme stops
-   phone browsers in dark mode from repainting the light panels themselves. */
+/* The page alternates light and dark panels by design. Declaring the scheme
+   stops phone browsers in dark mode from repainting the light panels. */
 :root { color-scheme: light; }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -134,75 +134,86 @@ p { margin: 0 0 1.1em; }
 .scc-btn--outline-navy:hover { background: var(--scc-navy); color: #fff; }
 
 /* ---------------------------------------------------------------- header */
-.scc-topbar {
-  background: var(--scc-navy);
-  color: #fff;
-  font-size: 0.92rem;
-}
-.scc-topbar__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 40px;
-  flex-wrap: wrap;
-}
-.scc-topbar__note {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-weight: 600;
-}
-.scc-topbar a { color: #fff; text-decoration: none; font-weight: 700; }
-.scc-topbar a:hover { text-decoration: underline; }
-.scc-topbar__links { display: flex; gap: 1.25rem; align-items: center; }
-
-/* The logo carries navy AND white inside it, so the header bar stays light -
-   recolouring the mark to sit on black destroys its inner knockout letters. */
+/* Black bar with white type, following the mockup. The logo needs no dark
+   variant: every shape in it is already outlined in white, so it sits on black
+   unaltered. Recolouring it would have destroyed those keylines. */
 .scc-header {
   position: sticky;
   top: 0;
   z-index: 60;
-  /* Fully opaque on purpose: the sections underneath are dark with white text,
-     and even 3% transparency let that text ghost through the header. */
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  /* Pure black on purpose: it has to match the black in the logo artwork
+     exactly, or the logo shows up as a slightly different rectangle. Fully
+     opaque - the sections underneath are dark, and even 3% transparency let
+     their text ghost through. */
+  background: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 .scc-header__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  min-height: 84px;
+  gap: clamp(0.9rem, 2vw, 2rem);
+  min-height: 92px;
+  /* Wider than the 1200px body container. The menu labels are long, and the
+     row has to hold the logo, six of them, the phone number and a button. */
+  max-width: 1440px;
 }
-.scc-header__logo img { width: clamp(160px, 17vw, 230px); height: auto; }
-.scc-header__logo { display: block; line-height: 0; }
-.scc-header__actions { display: flex; align-items: center; gap: 0.9rem; }
+/* Sized by height, not width: this logo is a wide badge-plus-wordmark lockup,
+   so height is what keeps it in proportion with the bar. */
+.scc-header__logo img { height: clamp(48px, 5vw, 72px); width: auto; }
+.scc-header__logo { display: block; line-height: 0; flex: none; }
+.scc-header__actions { display: flex; align-items: center; gap: clamp(0.5rem, 1vw, 1rem); flex: none; }
 .scc-header__phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--scc-font-head);
   font-weight: 700;
-  font-size: 1.35rem;
-  color: var(--scc-navy);
+  font-size: clamp(1.05rem, 1.25vw, 1.3rem);
+  color: #fff;
   text-decoration: none;
   white-space: nowrap;
 }
-.scc-header__phone:hover { color: var(--scc-red); }
+.scc-header__phone svg { color: var(--scc-red-accent); flex: none; }
+.scc-header__phone:hover { color: var(--scc-red-accent); }
+
+/* The outlined action button from the mockup, pointed at the service enquiry
+   rather than a quote form. */
+.scc-header__cta {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid var(--scc-red);
+  border-radius: var(--scc-radius);
+  padding: 0.6rem clamp(0.75rem, 1.1vw, 1.15rem);
+  font-family: var(--scc-font-head);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.scc-header__cta:hover { background: var(--scc-red); border-color: var(--scc-red); color: #fff; }
 
 /* Real menu labels are long ("Lithium Battery Upgrades", "Performance
-   Upgrades"). Six of those plus the logo and phone number will not fit on one
-   line at 1280 unless the spacing tightens as the viewport narrows. */
+   Upgrades"). Six of those plus the logo, phone number and button will not fit
+   on one line at 1280 unless the spacing tightens as the viewport narrows. */
 .scc-nav__list {
   display: flex;
-  gap: clamp(0.7rem, 1.6vw, 1.6rem);
+  gap: clamp(0.5rem, 0.95vw, 1.4rem);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 .scc-nav__list a {
   text-decoration: none;
-  color: var(--scc-on-light);
+  color: #fff;
   font-weight: 600;
-  font-size: clamp(0.9rem, 1.05vw, 1rem);
+  font-size: clamp(0.7rem, 0.95vw, 0.9rem);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   padding-block: 0.4rem;
   display: inline-block;
   border-bottom: 2px solid transparent;
@@ -210,17 +221,17 @@ p { margin: 0 0 1.1em; }
 }
 .scc-nav__list a:hover,
 .scc-nav__list .current-menu-item > a {
-  color: var(--scc-red);
-  border-bottom-color: var(--scc-red);
+  color: var(--scc-red-accent);
+  border-bottom-color: var(--scc-red-accent);
 }
 
 .scc-burger {
   display: none;
   align-items: center;
   gap: 0.5rem;
-  background: var(--scc-navy);
+  background: transparent;
   color: #fff;
-  border: 0;
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: var(--scc-radius);
   padding: 0.7rem 1rem;
   font-family: var(--scc-font-head);
@@ -459,6 +470,9 @@ p { margin: 0 0 1.1em; }
   gap: 1rem;
   flex-wrap: wrap;
 }
+/* Sold cards have no price block, so the button would drift to the left edge
+   on its own. Push it back to where it sits on every other card. */
+.scc-cart__foot--sold { justify-content: flex-end; }
 .scc-cart__price {
   font-family: var(--scc-font-head);
   font-size: 1.5rem;
@@ -510,6 +524,9 @@ p { margin: 0 0 1.1em; }
 .scc-cart__status--sold { background: #4a5563; }
 
 /* shown in place of the grid when no carts are in stock */
+/* The "recently built and sold" strip that follows the empty state. */
+.scc-recent__label { margin-top: 2.4rem; text-align: center; }
+
 .scc-empty {
   border: 1px dashed var(--scc-line);
   border-radius: var(--scc-radius-lg);
@@ -574,7 +591,16 @@ p { margin: 0 0 1.1em; }
   grid-template-columns: 1.4fr 1fr 1fr;
   gap: clamp(1.8rem, 4vw, 3.5rem);
 }
-.scc-footer__logo { background: #fff; border-radius: var(--scc-radius); padding: 0.9rem 1rem; display: inline-block; }
+.scc-footer__logo { display: inline-block; line-height: 0; }
+.scc-footer__logo img { width: 230px; max-width: 100%; height: auto; }
+.scc-footer__pickup {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--scc-red-accent);
+  font-weight: 700;
+}
+.scc-footer__pickup svg { flex: none; }
 .scc-footer__logo img { width: 210px; }
 .scc-footer h3 { color: #fff; font-size: 1.15rem; margin-bottom: 0.9rem; }
 .scc-footer a { color: var(--scc-on-dark-muted); text-decoration: none; }
@@ -643,8 +669,8 @@ p { margin: 0 0 1.1em; }
 }
 .scc-skip:focus { left: 0; }
 
-/* ---------------------------------------------------------------- 960px  */
-@media (max-width: 960px) {
+/* --------------------------------------------------------------- 1180px  */
+@media (max-width: 1180px) {
   .scc-nav { display: none; }
   .scc-nav.is-open {
     display: block;
@@ -652,12 +678,12 @@ p { margin: 0 0 1.1em; }
     top: 100%;
     left: 0;
     right: 0;
-    background: #fff;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: #000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: var(--scc-shadow);
   }
   .scc-nav.is-open .scc-nav__list { flex-direction: column; gap: 0; padding: 0.5rem 0; }
-  .scc-nav.is-open .scc-nav__list li { border-top: 1px solid rgba(0, 0, 0, 0.07); }
+  .scc-nav.is-open .scc-nav__list li { border-top: 1px solid rgba(255, 255, 255, 0.1); }
   .scc-nav.is-open .scc-nav__list li:first-child { border-top: 0; }
   .scc-nav.is-open .scc-nav__list a {
     display: block;
@@ -666,7 +692,10 @@ p { margin: 0 0 1.1em; }
   }
   .scc-burger { display: inline-flex; }
   .scc-header__inner { position: relative; }
+  /* Logo + phone + button + burger is too much for one line on a tablet.
+     Both of these are covered by the sticky call bar at the bottom. */
   .scc-header__phone { display: none; }
+  .scc-header__cta { display: none; }
 
   .scc-split, .scc-pickup__grid { grid-template-columns: 1fr; }
   .scc-split--flip .scc-split__media { order: 0; }
@@ -678,8 +707,6 @@ p { margin: 0 0 1.1em; }
 /* ---------------------------------------------------------------- 767px  */
 @media (max-width: 767px) {
   body { font-size: 16px; }
-  .scc-topbar__inner { justify-content: center; text-align: center; font-size: 0.85rem; }
-  .scc-topbar__links { gap: 0.9rem; }
   .scc-hero__inner { padding-block: 3rem 3.5rem; max-width: none; }
   .scc-hero__scrim {
     background: linear-gradient(

@@ -33,6 +33,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<li><a href="mailto:<?php echo esc_attr( scc_detail( 'email' ) ); ?>"><?php echo esc_html( scc_detail( 'email' ) ); ?></a></li>
 					<li><?php echo esc_html( scc_detail( 'town' ) ); ?></li>
 					<li><?php echo esc_html( scc_detail( 'hours' ) ); ?></li>
+					<?php /* This used to live in the strip above the header. That strip is gone, so keep the promise on every page here instead. */ ?>
+					<li class="scc-footer__pickup">
+						<?php echo scc_icon( 'truck', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						<?php echo esc_html( scc_detail( 'pickup_note' ) ); ?>
+					</li>
 				</ul>
 			</div>
 

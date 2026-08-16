@@ -50,9 +50,13 @@ while ( have_posts() ) :
 						<?php echo esc_html( isset( $statuses[ $status ] ) ? $statuses[ $status ] : $status ); ?>
 					</p>
 
-					<h2 style="font-size:clamp(1.8rem,4vw,2.6rem);">
-						<?php echo $price ? esc_html( $price ) : esc_html__( 'Call for price', 'salado-custom-carts' ); ?>
-					</h2>
+					<?php /* No price headline on a cart that has already gone - the
+					         eyebrow above says SOLD, and the note below explains it. */ ?>
+					<?php if ( 'sold' !== $status ) : ?>
+						<h2 style="font-size:clamp(1.8rem,4vw,2.6rem);">
+							<?php echo $price ? esc_html( $price ) : esc_html__( 'Call for price', 'salado-custom-carts' ); ?>
+						</h2>
+					<?php endif; ?>
 
 					<?php if ( $features ) : ?>
 						<ul class="scc-check">

@@ -52,11 +52,15 @@ function scc_render_cart_card( $post_id ) {
 				</ul>
 			<?php endif; ?>
 
-			<div class="scc-cart__foot">
-				<p class="scc-cart__price">
-					<small><?php esc_html_e( 'Asking price', 'salado-custom-carts' ); ?></small>
-					<?php echo $price ? esc_html( $price ) : esc_html__( 'Call for price', 'salado-custom-carts' ); ?>
-				</p>
+			<?php /* A sold cart has no asking price to quote, so the card drops that
+			         block entirely rather than inviting a call about it. */ ?>
+			<div class="scc-cart__foot<?php echo 'sold' === $status ? ' scc-cart__foot--sold' : ''; ?>">
+				<?php if ( 'sold' !== $status ) : ?>
+					<p class="scc-cart__price">
+						<small><?php esc_html_e( 'Asking price', 'salado-custom-carts' ); ?></small>
+						<?php echo $price ? esc_html( $price ) : esc_html__( 'Call for price', 'salado-custom-carts' ); ?>
+					</p>
+				<?php endif; ?>
 				<a class="scc-cart__cta" href="<?php echo esc_url( $link ); ?>">
 					<?php esc_html_e( 'View cart', 'salado-custom-carts' ); ?>
 				</a>
@@ -99,13 +103,19 @@ function scc_carts_shortcode( $atts ) {
 	// Stock runs out. An empty grid would leave a heading floating over a gap, so
 	// say something useful instead and keep the call to action alive.
 	if ( ! $query->have_posts() ) {
-		return sprintf(
+		$out = sprintf(
 			'<div class="scc-empty"><p class="scc-empty__title">%s</p><p class="scc-empty__text">%s</p><a class="scc-btn scc-btn--primary" href="tel:%s">%s</a></div>',
 			esc_html__( 'Nothing in stock this minute', 'salado-custom-carts' ),
 			esc_html__( 'Carts move quickly. Tell us what you are after - budget, seats, lifted or standard - and we will find one and build it out for you.', 'salado-custom-carts' ),
 			esc_attr( scc_phone_link() ),
 			sprintf( esc_html__( 'Call %s', 'salado-custom-carts' ), esc_html( scc_detail( 'phone' ) ) )
 		);
+
+		// Rather than end on "nothing here", show what has already gone out of
+		// the workshop. An empty page proves nothing; recent builds do.
+		$out .= scc_recent_builds( (int) $atts['count'] );
+
+		return $out;
 	}
 
 	$out = '<div class="scc-carts">';
@@ -119,6 +129,41 @@ function scc_carts_shortcode( $atts ) {
 	return $out;
 }
 add_shortcode( 'scc_carts', 'scc_carts_shortcode' );
+
+/**
+ * Recently sold carts, shown when there is nothing in stock. Returns an empty
+ * string if there is nothing sold either, so a brand new site shows no stray
+ * heading.
+ */
+function scc_recent_builds( $count = 3 ) {
+	$query = new WP_Query( array(
+		'post_type'      => 'scc_cart',
+		'posts_per_page' => max( 1, (int) $count ),
+		'no_found_rows'  => true,
+		'meta_query'     => array(
+			array( 'key' => '_scc_status', 'value' => 'sold' ),
+		),
+	) );
+
+	if ( ! $query->have_posts() ) {
+		return '';
+	}
+
+	$out = sprintf(
+		'<p class="scc-eyebrow scc-recent__label">%s</p><div class="scc-carts">',
+		esc_html__( 'Recently built and sold', 'salado-custom-carts' )
+	);
+
+	foreach ( $query->posts as $post ) {
+		$out .= scc_render_cart_card( $post->ID );
+	}
+
+	$out .= '</div>';
+
+	wp_reset_postdata();
+
+	return $out;
+}
 
 /**
  * [scc_phone] and [scc_email] - so contact details in page copy stay in sync
