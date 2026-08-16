@@ -175,7 +175,7 @@ p { margin: 0 0 1.1em; }
   gap: 1.5rem;
   min-height: 84px;
 }
-.scc-header__logo img { width: clamp(180px, 22vw, 250px); height: auto; }
+.scc-header__logo img { width: clamp(160px, 17vw, 230px); height: auto; }
 .scc-header__logo { display: block; line-height: 0; }
 .scc-header__actions { display: flex; align-items: center; gap: 0.9rem; }
 .scc-header__phone {
@@ -188,9 +188,12 @@ p { margin: 0 0 1.1em; }
 }
 .scc-header__phone:hover { color: var(--scc-red); }
 
+/* Real menu labels are long ("Lithium Battery Upgrades", "Performance
+   Upgrades"). Six of those plus the logo and phone number will not fit on one
+   line at 1280 unless the spacing tightens as the viewport narrows. */
 .scc-nav__list {
   display: flex;
-  gap: clamp(1rem, 2.2vw, 2rem);
+  gap: clamp(0.7rem, 1.6vw, 1.6rem);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -199,10 +202,11 @@ p { margin: 0 0 1.1em; }
   text-decoration: none;
   color: var(--scc-on-light);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1.05vw, 1rem);
   padding-block: 0.4rem;
   display: inline-block;
   border-bottom: 2px solid transparent;
+  white-space: nowrap;
 }
 .scc-nav__list a:hover,
 .scc-nav__list .current-menu-item > a {
