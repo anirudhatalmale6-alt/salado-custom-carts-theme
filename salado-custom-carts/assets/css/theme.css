@@ -154,8 +154,8 @@ p { margin: 0 0 1.1em; }
   justify-content: space-between;
   gap: clamp(0.9rem, 2vw, 2rem);
   min-height: 92px;
-  /* Wider than the 1200px body container. The menu labels are long, and the
-     row has to hold the logo, six of them, the phone number and a button. */
+  /* Wider than the 1200px body container: the row holds the logo, six links,
+     the phone number and a button, and needs the extra room to breathe. */
   max-width: 1440px;
 }
 /* Sized by height, not width: this logo is a wide badge-plus-wordmark lockup,
@@ -197,12 +197,12 @@ p { margin: 0 0 1.1em; }
 }
 .scc-header__cta:hover { background: var(--scc-red); border-color: var(--scc-red); color: #fff; }
 
-/* Real menu labels are long ("Lithium Battery Upgrades", "Performance
-   Upgrades"). Six of those plus the logo, phone number and button will not fit
-   on one line at 1280 unless the spacing tightens as the viewport narrows. */
+/* Menu labels were shortened by the client, which freed up a lot of room, so
+   the links are spaced generously again. Everything still scales with the
+   viewport - the longest label ("Carts for Sale") sets the floor. */
 .scc-nav__list {
   display: flex;
-  gap: clamp(0.5rem, 0.95vw, 1.4rem);
+  gap: clamp(0.9rem, 1.9vw, 2.4rem);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -211,8 +211,8 @@ p { margin: 0 0 1.1em; }
   text-decoration: none;
   color: #fff;
   font-weight: 600;
-  font-size: clamp(0.7rem, 0.95vw, 0.9rem);
-  letter-spacing: 0.03em;
+  font-size: clamp(0.82rem, 1vw, 1rem);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding-block: 0.4rem;
   display: inline-block;
@@ -669,8 +669,8 @@ p { margin: 0 0 1.1em; }
 }
 .scc-skip:focus { left: 0; }
 
-/* --------------------------------------------------------------- 1180px  */
-@media (max-width: 1180px) {
+/* --------------------------------------------------------------- 1150px  */
+@media (max-width: 1150px) {
   .scc-nav { display: none; }
   .scc-nav.is-open {
     display: block;
