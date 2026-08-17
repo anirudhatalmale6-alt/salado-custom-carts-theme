@@ -27,7 +27,7 @@ function scc_home_blocks() {
 	$lithium = scc_img( 'lithium-pack.jpg' );
 	$phone   = scc_detail( 'phone' );
 	$tel     = scc_phone_link();
-	$service = scc_service_link();
+	$service = scc_quote_link();
 
 	$blocks = array();
 
@@ -53,7 +53,7 @@ function scc_home_blocks() {
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline","textColor":"white"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="' . esc_url( $service ) . '">Schedule Your Service</a></div>
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="' . esc_url( $service ) . '">Request a Quote</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->
@@ -210,7 +210,7 @@ function scc_home_blocks() {
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline","textColor":"white"} -->
-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="' . esc_url( $service ) . '">Schedule Your Service</a></div>
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-white-color has-text-color wp-element-button" href="' . esc_url( $service ) . '">Request a Quote</a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->

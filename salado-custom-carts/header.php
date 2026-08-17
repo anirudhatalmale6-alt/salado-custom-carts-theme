@@ -58,8 +58,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php echo scc_icon( 'phone', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<?php echo esc_html( scc_detail( 'phone' ) ); ?>
 			</a>
-			<a class="scc-header__cta" href="<?php echo esc_url( scc_service_link() ); ?>">
-				<?php esc_html_e( 'Schedule Service', 'salado-custom-carts' ); ?>
+			<a class="scc-header__cta" href="<?php echo esc_url( scc_quote_link() ); ?>">
+				<?php esc_html_e( 'Request a Quote', 'salado-custom-carts' ); ?>
 			</a>
 			<button class="scc-burger" type="button" aria-expanded="false" aria-controls="scc-nav">
 				<span class="scc-burger__bars" aria-hidden="true"></span>

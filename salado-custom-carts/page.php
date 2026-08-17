@@ -1,6 +1,9 @@
 <?php
 /**
- * Standard page.
+ * Standard page - content column plus sidebar.
+ *
+ * A page can opt out of the sidebar from the editor (Page Attributes >
+ * Template > Full width), which is what the homepage-style pages want.
  *
  * @package salado-custom-carts
  */
@@ -13,6 +16,8 @@ get_header();
 
 while ( have_posts() ) :
 	the_post();
+
+	$with_aside = ! scc_page_is_full_width( get_the_ID() );
 	?>
 	<div class="scc-pagehead">
 		<div class="scc-container">
@@ -23,9 +28,17 @@ while ( have_posts() ) :
 		</div>
 	</div>
 
-	<div class="scc-content">
-		<div class="scc-container">
-			<?php the_content(); ?>
+	<div class="scc-content<?php echo $with_aside ? ' scc-content--aside' : ''; ?>">
+		<div class="scc-container<?php echo $with_aside ? ' scc-page' : ''; ?>">
+			<div class="scc-page__main">
+				<?php the_content(); ?>
+			</div>
+
+			<?php
+			if ( $with_aside ) {
+				scc_page_aside();
+			}
+			?>
 		</div>
 	</div>
 	<?php

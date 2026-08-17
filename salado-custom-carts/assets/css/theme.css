@@ -653,10 +653,174 @@ p { margin: 0 0 1.1em; }
 .scc-pagehead p { color: var(--scc-on-dark-muted); margin: 0; max-width: 60ch; }
 
 .scc-content { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
-.scc-content .scc-container > * { max-width: 780px; margin-inline: auto; }
-.scc-content .alignwide { max-width: 1100px; }
+
+/* Pages used to be a single 780px column floating in a 1200px container, which
+   left a lot of white space and made every page look thinner than the
+   homepage. Content and sidebar now share the full width. */
+.scc-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: clamp(2rem, 3.5vw, 3.5rem);
+  align-items: start;
+}
+.scc-page__main { min-width: 0; }
+.scc-page__main--wide { max-width: 900px; margin-inline: auto; }
+
+.scc-content .alignwide { max-width: none; }
 .scc-content .alignfull { max-width: none; }
-.scc-content img { border-radius: var(--scc-radius); }
+.scc-content img { border-radius: var(--scc-radius); height: auto; }
+
+/* Old page-builder content arrives as loose text nodes and bare iframes with
+   no dimensions, so give them sensible defaults rather than leaving a 300px
+   map stranded in the corner. */
+.scc-page__main iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  height: auto;
+  border: 0;
+  border-radius: var(--scc-radius);
+}
+.scc-page__main h2 { margin-top: 1.6em; }
+.scc-page__main h3 { margin-top: 1.4em; }
+.scc-page__main > :first-child { margin-top: 0; }
+.scc-page__main ul, .scc-page__main ol { padding-left: 1.25rem; }
+.scc-page__main li { margin-bottom: 0.4em; }
+
+/* ---------------------------------------------------------------- sidebar */
+.scc-aside__inner {
+  position: sticky;
+  /* Clears the sticky header, which is 92px tall. */
+  top: 108px;
+  display: grid;
+  gap: 1rem;
+}
+.scc-aside__card {
+  background: var(--scc-paper-2);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--scc-radius-lg);
+  padding: 1.25rem 1.3rem;
+}
+.scc-aside__card--call { background: var(--scc-ink); border-color: transparent; color: var(--scc-on-dark); }
+.scc-aside__label {
+  font-family: var(--scc-font-head);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--scc-on-light-muted);
+  margin: 0 0 0.6rem;
+}
+.scc-aside__card--call .scc-aside__label { color: var(--scc-red-accent); }
+.scc-aside__phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--scc-font-head);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  line-height: 1.1;
+}
+.scc-aside__phone svg { color: var(--scc-red-accent); flex: none; }
+.scc-aside__phone:hover { color: var(--scc-red-accent); }
+.scc-aside__hours {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.5rem 0 1rem;
+  font-size: 0.95rem;
+  color: var(--scc-on-dark-muted);
+}
+.scc-aside__hours svg { flex: none; }
+.scc-aside__btn { width: 100%; padding: 0.85rem 1rem; font-size: 1rem; }
+.scc-aside__btn:hover { transform: none; }
+
+.scc-aside__pickup {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0 0 0.5rem;
+  font-family: var(--scc-font-head);
+  text-transform: uppercase;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--scc-red);
+}
+.scc-aside__pickup svg { flex: none; margin-top: 2px; }
+.scc-aside__note { margin: 0; font-size: 0.95rem; color: var(--scc-on-light-muted); }
+
+.scc-aside__links { list-style: none; margin: 0; padding: 0; }
+.scc-aside__links li + li { border-top: 1px solid rgba(0, 0, 0, 0.08); }
+.scc-aside__links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  color: var(--scc-on-light);
+  text-decoration: none;
+  font-weight: 600;
+}
+.scc-aside__links a:hover { color: var(--scc-red); }
+.scc-aside__links svg { flex: none; opacity: 0.5; }
+.scc-aside__links a:hover svg { opacity: 1; }
+
+.scc-aside__where { display: flex; align-items: center; gap: 0.45rem; margin: 0 0 0.4rem; font-weight: 600; }
+.scc-aside__where svg { flex: none; color: var(--scc-red); }
+.scc-aside__mail { font-size: 0.95rem; word-break: break-word; }
+
+/* ------------------------------------------------------------- quote form */
+.scc-quote { margin-block: 2rem; scroll-margin-top: 110px; }
+.scc-quote__title { margin-bottom: 0.6em; }
+.scc-quote__msg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--scc-radius);
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+}
+.scc-quote__msg--ok { background: #e8f6ec; color: #14532d; border: 1px solid #b7e3c4; }
+.scc-quote__msg--ok svg { flex: none; }
+.scc-quote__msg--bad { background: #fdeaee; color: #7a0a22; border: 1px solid #f5c2ce; }
+
+.scc-quote__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+.scc-quote__field--wide, .scc-quote__actions { grid-column: 1 / -1; }
+.scc-quote__field label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+}
+.scc-quote__opt { font-weight: 400; color: var(--scc-on-light-muted); font-size: 0.85rem; }
+.scc-quote__field input,
+.scc-quote__field textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--scc-on-light);
+  background: #fff;
+  padding: 0.75rem 0.85rem;
+  border: 2px solid rgba(0, 0, 0, 0.16);
+  border-radius: var(--scc-radius);
+}
+.scc-quote__field input:focus,
+.scc-quote__field textarea:focus { outline: 0; border-color: var(--scc-navy); }
+.scc-quote__field.is-missing input,
+.scc-quote__field.is-missing textarea { border-color: var(--scc-red); background: #fff7f8; }
+.scc-quote__hint { margin: 0.35rem 0 0; font-size: 0.87rem; color: var(--scc-on-light-muted); }
+/* Off-screen rather than display:none - some bots skip hidden inputs. */
+.scc-quote__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.scc-quote__actions { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.scc-quote__alt { margin: 0; color: var(--scc-on-light-muted); }
 
 .scc-skip {
   position: absolute;
@@ -704,6 +868,14 @@ p { margin: 0 0 1.1em; }
   .scc-footer__grid { grid-template-columns: 1fr 1fr; }
 }
 
+/* ---------------------------------------------------------------- 960px  */
+@media (max-width: 960px) {
+  /* Sidebar drops under the copy. Sticky has to go with it, or it pins
+     itself halfway down the page on the way past. */
+  .scc-page { grid-template-columns: 1fr; }
+  .scc-aside__inner { position: static; }
+}
+
 /* ---------------------------------------------------------------- 767px  */
 @media (max-width: 767px) {
   body { font-size: 16px; }
@@ -720,6 +892,7 @@ p { margin: 0 0 1.1em; }
   .scc-trust__grid, .scc-cards, .scc-carts { grid-template-columns: 1fr; }
   .scc-savings { grid-template-columns: 1fr; }
   .scc-footer__grid { grid-template-columns: 1fr; }
+  .scc-quote__form { grid-template-columns: 1fr; }
   .scc-callbar { display: flex; }
   /* keep the fixed call bar from covering the end of the page */
   body { padding-bottom: 58px; }

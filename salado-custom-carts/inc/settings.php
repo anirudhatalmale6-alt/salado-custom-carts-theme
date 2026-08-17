@@ -16,7 +16,7 @@ function scc_settings_fields() {
 	return array(
 		'phone'       => array( 'label' => __( 'Phone number', 'salado-custom-carts' ), 'hint' => __( 'Shown in the header, footer and the mobile Call button.', 'salado-custom-carts' ) ),
 		'email'         => array( 'label' => __( 'Email address', 'salado-custom-carts' ), 'hint' => __( 'General enquiries - shown in the top bar and footer.', 'salado-custom-carts' ) ),
-		'service_email' => array( 'label' => __( 'Service / repair email', 'salado-custom-carts' ), 'hint' => __( 'Where the "Schedule Your Service" buttons send bookings.', 'salado-custom-carts' ) ),
+		'service_email' => array( 'label' => __( 'Service / repair email', 'salado-custom-carts' ), 'hint' => __( 'Where quote requests are emailed. Also used by the Request a Quote buttons if no page has the form on it.', 'salado-custom-carts' ) ),
 		'town'        => array( 'label' => __( 'Town', 'salado-custom-carts' ), 'hint' => __( 'e.g. Salado, Texas', 'salado-custom-carts' ) ),
 		'hours'       => array( 'label' => __( 'Hours', 'salado-custom-carts' ), 'hint' => '' ),
 		'pickup_note' => array( 'label' => __( 'Pickup line', 'salado-custom-carts' ), 'hint' => __( 'The short line shown in the blue bar at the top of every page.', 'salado-custom-carts' ) ),

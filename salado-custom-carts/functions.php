@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SCC_VERSION', '1.2.1' );
+define( 'SCC_VERSION', '1.3.0' );
 
 /**
  * Business details live in one place so they can be changed once and update
@@ -69,6 +69,52 @@ function scc_service_link() {
 	);
 }
 
+/**
+ * Where the "Request a Quote" buttons point.
+ *
+ * If a page carries the [scc_quote_form] shortcode, they go to that form.
+ * If nobody has put the form anywhere, they fall back to the mailto so the
+ * buttons are never dead. The lookup is cached - it is a page query on every
+ * request otherwise.
+ */
+function scc_quote_link() {
+	$cached = get_transient( 'scc_quote_page' );
+
+	if ( false === $cached ) {
+		$cached = 0;
+
+		$pages = get_posts( array(
+			'post_type'      => 'page',
+			'post_status'    => 'publish',
+			'posts_per_page' => 20,
+			'fields'         => 'ids',
+			's'              => 'scc_quote_form',
+		) );
+
+		foreach ( $pages as $page_id ) {
+			if ( has_shortcode( (string) get_post_field( 'post_content', $page_id ), 'scc_quote_form' ) ) {
+				$cached = $page_id;
+				break;
+			}
+		}
+
+		set_transient( 'scc_quote_page', $cached, DAY_IN_SECONDS );
+	}
+
+	if ( $cached ) {
+		return get_permalink( $cached ) . '#request-a-quote';
+	}
+
+	return scc_service_link();
+}
+
+/** The cached lookup has to let go when a page changes. */
+function scc_flush_quote_page_cache() {
+	delete_transient( 'scc_quote_page' );
+}
+add_action( 'save_post_page', 'scc_flush_quote_page_cache' );
+add_action( 'deleted_post', 'scc_flush_quote_page_cache' );
+
 function scc_setup() {
 	load_theme_textdomain( 'salado-custom-carts', get_template_directory() . '/languages' );
 
@@ -113,6 +159,50 @@ require_once get_template_directory() . '/inc/cart-fields.php';
 require_once get_template_directory() . '/inc/shortcodes.php';
 require_once get_template_directory() . '/inc/settings.php';
 require_once get_template_directory() . '/inc/patterns.php';
+require_once get_template_directory() . '/inc/page-aside.php';
+require_once get_template_directory() . '/inc/quote-form.php';
+
+/**
+ * True when a page should run without the sidebar. The front page never gets
+ * one - it is built from full-bleed blocks.
+ */
+function scc_page_is_full_width( $post_id = null ) {
+	$post_id = $post_id ? $post_id : get_the_ID();
+
+	if ( is_front_page() ) {
+		return true;
+	}
+
+	return 'page-full-width.php' === get_page_template_slug( $post_id );
+}
+
+/**
+ * Pages migrated from the old builder usually open with a heading that repeats
+ * the page title, which now shows twice: once in the dark page header, once at
+ * the top of the copy. Drop the duplicate, and only when it is an exact match
+ * so nothing meaningful is ever removed.
+ */
+function scc_strip_duplicate_title( $content ) {
+	if ( ! is_page() || ! in_the_loop() || ! is_main_query() ) {
+		return $content;
+	}
+
+	$title = trim( wp_strip_all_tags( get_the_title() ) );
+	if ( '' === $title ) {
+		return $content;
+	}
+
+	return preg_replace_callback(
+		'#^\s*<h([1-3])\b[^>]*>(.*?)</h\1>#is',
+		function ( $m ) use ( $title ) {
+			$heading = trim( wp_strip_all_tags( $m[2] ) );
+			return 0 === strcasecmp( $heading, $title ) ? '' : $m[0];
+		},
+		$content,
+		1
+	);
+}
+add_filter( 'the_content', 'scc_strip_duplicate_title', 8 );
 
 /**
  * Small icon helper. Inline SVG keeps it to zero extra requests and lets the
