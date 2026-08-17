@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SCC_VERSION', '1.3.0' );
+define( 'SCC_VERSION', '1.3.1' );
 
 /**
  * Business details live in one place so they can be changed once and update

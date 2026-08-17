@@ -670,6 +670,49 @@ p { margin: 0 0 1.1em; }
 .scc-content .alignfull { max-width: none; }
 .scc-content img { border-radius: var(--scc-radius); height: auto; }
 
+/* Classic-editor media alignment.
+   WordPress does NOT supply the float rules for .alignleft / .alignright on a
+   classic theme - core only styles them via .is-layout-flow / .is-layout-
+   constrained / .wp-site-blocks, which a plain <img class="alignright"> from
+   the classic editor never sits inside. Without these the editor's
+   Align left / Align right buttons write the class and nothing happens on the
+   front end. */
+.scc-content .alignleft {
+  float: left;
+  margin: 0.35rem 1.75rem 1.25rem 0;
+  max-width: 50%;
+}
+.scc-content .alignright {
+  float: right;
+  margin: 0.35rem 0 1.25rem 1.75rem;
+  max-width: 50%;
+}
+.scc-content .aligncenter {
+  display: block;
+  margin-inline: auto;
+  margin-bottom: 1.25rem;
+}
+.scc-content .alignnone { margin-bottom: 1.25rem; }
+
+/* The editor wraps a lone image in its own <p>. The float escapes the now
+   empty paragraph, but the paragraph's bottom margin stays behind as a gap. */
+.scc-content p:has(> .alignleft:only-child),
+.scc-content p:has(> .alignright:only-child) { margin: 0; }
+
+/* Captions carry the align class on the wrapper, and WP sets an inline width
+   on it, so cap the image rather than the box. */
+.scc-content .wp-caption { max-width: 100%; }
+.scc-content .wp-caption img { max-width: 100%; }
+.scc-content .wp-caption-text {
+  margin: 0.5rem 0 0;
+  font-size: 0.88rem;
+  color: var(--scc-on-light-muted);
+}
+
+/* Keep a tall float from hanging out of the bottom of the content column and
+   colliding with the footer. */
+.scc-page__main::after { content: ""; display: table; clear: both; }
+
 /* Old page-builder content arrives as loose text nodes and bare iframes with
    no dimensions, so give them sensible defaults rather than leaving a 300px
    map stranded in the corner. */
@@ -894,6 +937,15 @@ p { margin: 0 0 1.1em; }
   .scc-footer__grid { grid-template-columns: 1fr; }
   .scc-quote__form { grid-template-columns: 1fr; }
   .scc-callbar { display: flex; }
+  /* A 300px float in a 360px column leaves a two-word-wide gutter, so wrapped
+     images go full width and stack on phones. */
+  .scc-content .alignleft,
+  .scc-content .alignright {
+    float: none;
+    display: block;
+    max-width: 100%;
+    margin: 0 auto 1.25rem;
+  }
   /* keep the fixed call bar from covering the end of the page */
   body { padding-bottom: 58px; }
   .scc-footer__bottom { justify-content: center; text-align: center; }
