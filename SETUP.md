@@ -79,6 +79,30 @@ and it can be switched back on if you ever change your mind.
 While WooCommerce is still active, the theme already stops it loading its cart and
 checkout scripts on every page, since nothing is sold online here.
 
+## 7. Spam on the quote form
+
+The form blocks the obvious junk on its own the moment the theme is active -
+nothing to switch on, no keys needed. Two hidden traps, a check on how fast the
+form was filled in, a limit per address, and a read of the wording.
+
+To add a proper CAPTCHA on top:
+
+1. Go to dash.cloudflare.com and sign in (a free account is enough - your site
+   does NOT have to be on Cloudflare).
+2. Turnstile > Add site. Put `saladocustomcarts.com` in the domain box.
+3. Copy the two keys it gives you.
+4. In WordPress: Settings > Salado Details > Spam protection. Paste them in and
+   save. The CAPTCHA only switches on once BOTH boxes are filled.
+
+Nothing is deleted behind your back. Anything the filter is unsure about is
+saved as a **draft** under Quote Requests, marked with the reason, and simply not
+emailed to you. If one turns out to be a real customer, open it and hit Publish.
+Only a hidden-trap hit is thrown away outright, and no human being can trigger
+one of those.
+
+If Cloudflare is ever unreachable, the form lets the enquiry through and marks
+it, rather than turning your phone off for the length of someone else's outage.
+
 ## Notes
 
 - Colours come from your real logo: navy `#002068`, red `#b80830`.

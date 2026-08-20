@@ -64,6 +64,7 @@ function scc_enquiry_columns( $columns ) {
 		'title'     => __( 'From', 'salado-custom-carts' ),
 		'scc_phone' => __( 'Phone', 'salado-custom-carts' ),
 		'scc_what'  => __( 'What they need', 'salado-custom-carts' ),
+		'scc_flag'  => __( 'Spam check', 'salado-custom-carts' ),
 		'date'      => __( 'Received', 'salado-custom-carts' ),
 	);
 }
@@ -79,6 +80,19 @@ function scc_enquiry_column( $column, $post_id ) {
 	if ( 'scc_what' === $column ) {
 		echo esc_html( wp_trim_words( (string) get_post_meta( $post_id, '_scc_e_message', true ), 18 ) );
 	}
+	if ( 'scc_flag' === $column ) {
+		$flag = (string) get_post_meta( $post_id, '_scc_e_spam', true );
+		if ( '' === $flag ) {
+			printf( '<span style="color:#1a7f37">%s</span>', esc_html__( 'Passed', 'salado-custom-carts' ) );
+		} else {
+			printf(
+				'<span style="color:#b32d2e" title="%s">%s</span><br /><small>%s</small>',
+				esc_attr( $flag ),
+				esc_html__( 'Looks like spam', 'salado-custom-carts' ),
+				esc_html( $flag )
+			);
+		}
+	}
 }
 add_action( 'manage_scc_enquiry_posts_custom_column', 'scc_enquiry_column', 10, 2 );
 
@@ -92,6 +106,16 @@ function scc_enquiry_meta_box() {
 add_action( 'add_meta_boxes', 'scc_enquiry_meta_box' );
 
 function scc_enquiry_meta_box_render( $post ) {
+	$flag = (string) get_post_meta( $post->ID, '_scc_e_spam', true );
+	if ( '' !== $flag ) {
+		printf(
+			'<div class="notice notice-warning inline" style="margin:0 0 12px"><p><strong>%s</strong> %s<br /><em>%s</em></p></div>',
+			esc_html__( 'Held as suspected spam.', 'salado-custom-carts' ),
+			esc_html__( 'It was not emailed to you. If it is genuine, hit Publish and it will move to your real enquiries.', 'salado-custom-carts' ),
+			esc_html( $flag )
+		);
+	}
+
 	echo '<table class="widefat striped"><tbody>';
 	foreach ( scc_enquiry_fields() as $key => $field ) {
 		$value = (string) get_post_meta( $post->ID, '_scc_e_' . $key, true );
@@ -136,13 +160,6 @@ function scc_handle_quote_form() {
 		return;
 	}
 
-	// Honeypot: a real person never fills this in, it is hidden. Bots fill
-	// everything. Pretend it worked so they do not retry.
-	if ( ! empty( $_POST['scc_website'] ) ) {
-		wp_safe_redirect( add_query_arg( 'quote', 'sent', scc_quote_return_url() ) );
-		exit;
-	}
-
 	$values = array();
 	$errors = array();
 
@@ -169,16 +186,44 @@ function scc_handle_quote_form() {
 
 	$back = scc_quote_return_url();
 
+	/*
+	 * Spam screening. Runs before the validation errors below, so a bot filling
+	 * the form badly is thrown out rather than being handed a helpful list of
+	 * what it got wrong. See inc/antispam.php for what each action means.
+	 */
+	$screen = scc_screen_submission( $values );
+
+	if ( 'drop' === $screen['action'] ) {
+		// Certain bot. Show it the success page so it stops retrying, and save
+		// nothing at all.
+		scc_count_blocked();
+		wp_safe_redirect( add_query_arg( 'quote', 'sent', $back ) . '#request-a-quote' );
+		exit;
+	}
+
+	if ( 'block' === $screen['action'] ) {
+		// A person can fail a CAPTCHA. Give them their typing back and let them
+		// try again, rather than pretending it sent.
+		scc_count_blocked();
+		set_transient( 'scc_quote_old_' . scc_quote_visitor_key(), $values, 10 * MINUTE_IN_SECONDS );
+		wp_safe_redirect( add_query_arg( 'quote', 'captcha', $back ) . '#request-a-quote' );
+		exit;
+	}
+
 	if ( $errors ) {
 		set_transient( 'scc_quote_old_' . scc_quote_visitor_key(), $values, 10 * MINUTE_IN_SECONDS );
 		wp_safe_redirect( add_query_arg( 'quote', 'error', $back ) . '#request-a-quote' );
 		exit;
 	}
 
+	$suspect = 'flag' === $screen['action'];
+
 	// Save first, mail second. A saved enquiry survives a mail failure.
+	// Suspected spam is saved too, as a draft, so a wrong guess by the filter
+	// costs Andrew a click rather than a customer.
 	$post_id = wp_insert_post( array(
 		'post_type'   => 'scc_enquiry',
-		'post_status' => 'publish',
+		'post_status' => $suspect ? 'draft' : 'publish',
 		'post_title'  => sprintf(
 			/* translators: 1: sender name, 2: phone number */
 			__( '%1$s - %2$s', 'salado-custom-carts' ),
@@ -197,7 +242,12 @@ function scc_handle_quote_form() {
 	}
 	update_post_meta( $post_id, '_scc_e_page', esc_url_raw( $back ) );
 
-	scc_mail_quote( $values, $back );
+	if ( $suspect ) {
+		update_post_meta( $post_id, '_scc_e_spam', sanitize_text_field( $screen['reason'] ) );
+		scc_count_blocked();
+	} else {
+		scc_mail_quote( $values, $back );
+	}
 
 	wp_safe_redirect( add_query_arg( 'quote', 'sent', $back ) . '#request-a-quote' );
 	exit;
@@ -277,12 +327,12 @@ function scc_quote_form_shortcode( $atts ) {
 	 * on the same key - refilling on an ordinary visit would show one person
 	 * what the other had typed.
 	 */
-	if ( 'error' === $state ) {
+	if ( in_array( $state, array( 'error', 'captcha' ), true ) ) {
 		$stored = get_transient( $key );
 		$old    = is_array( $stored ) ? $stored : array();
 	}
 
-	if ( in_array( $state, array( 'error', 'sent' ), true ) ) {
+	if ( in_array( $state, array( 'error', 'captcha', 'sent' ), true ) ) {
 		delete_transient( $key );
 	}
 
@@ -301,6 +351,10 @@ function scc_quote_form_shortcode( $atts ) {
 		<?php elseif ( 'error' === $state ) : ?>
 			<p class="scc-quote__msg scc-quote__msg--bad">
 				<?php esc_html_e( 'Something was missing. Please check the fields marked below and send it again.', 'salado-custom-carts' ); ?>
+			</p>
+		<?php elseif ( 'captcha' === $state ) : ?>
+			<p class="scc-quote__msg scc-quote__msg--bad">
+				<?php esc_html_e( 'Please tick the "I am human" box below and send it again. Your details are still here.', 'salado-custom-carts' ); ?>
 			</p>
 		<?php endif; ?>
 
@@ -345,11 +399,7 @@ function scc_quote_form_shortcode( $atts ) {
 				</div>
 			<?php endforeach; ?>
 
-			<?php /* Hidden from people, irresistible to bots. */ ?>
-			<div class="scc-quote__hp" aria-hidden="true">
-				<label for="scc-website"><?php esc_html_e( 'Leave this empty', 'salado-custom-carts' ); ?></label>
-				<input type="text" id="scc-website" name="scc_website" tabindex="-1" autocomplete="off" />
-			</div>
+			<?php scc_antispam_fields(); ?>
 
 			<div class="scc-quote__actions">
 				<button type="submit" name="scc_quote_submit" value="1" class="scc-btn scc-btn--primary">

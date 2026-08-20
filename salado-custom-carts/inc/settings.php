@@ -23,8 +23,32 @@ function scc_settings_fields() {
 	);
 }
 
+/**
+ * Spam protection, kept in its own group so it reads as a separate job from the
+ * shop's phone number and hours.
+ */
+function scc_spam_settings_fields() {
+	return array(
+		'turnstile_site'   => array(
+			'label' => __( 'Turnstile site key', 'salado-custom-carts' ),
+			'hint'  => __( 'From dash.cloudflare.com > Turnstile > Add site. Free, and it does not require your website to be on Cloudflare.', 'salado-custom-carts' ),
+		),
+		'turnstile_secret' => array(
+			'label' => __( 'Turnstile secret key', 'salado-custom-carts' ),
+			'hint'  => __( 'The second key on the same screen. The CAPTCHA only switches on once both boxes are filled in.', 'salado-custom-carts' ),
+		),
+	);
+}
+
 function scc_register_settings() {
 	foreach ( array_keys( scc_settings_fields() ) as $key ) {
+		register_setting( 'scc_details', 'scc_' . $key, array(
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_text_field',
+			'default'           => '',
+		) );
+	}
+	foreach ( array_keys( scc_spam_settings_fields() ) as $key ) {
 		register_setting( 'scc_details', 'scc_' . $key, array(
 			'type'              => 'string',
 			'sanitize_callback' => 'sanitize_text_field',
@@ -65,6 +89,44 @@ function scc_settings_page_render() {
 								id="scc_<?php echo esc_attr( $key ); ?>"
 								name="scc_<?php echo esc_attr( $key ); ?>"
 								value="<?php echo esc_attr( scc_detail( $key ) ); ?>" />
+							<?php if ( $field['hint'] ) : ?>
+								<p class="description"><?php echo esc_html( $field['hint'] ); ?></p>
+							<?php endif; ?>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+			</table>
+
+			<h2><?php esc_html_e( 'Spam protection', 'salado-custom-carts' ); ?></h2>
+			<p>
+				<?php esc_html_e( 'The quote form always blocks the obvious junk on its own. Adding the two keys below turns on a proper CAPTCHA as well.', 'salado-custom-carts' ); ?>
+				<?php
+				$blocked = (int) get_option( 'scc_spam_blocked', 0 );
+				if ( $blocked > 0 ) {
+					echo '<br /><strong>';
+					printf(
+						/* translators: %d: number of blocked submissions */
+						esc_html( _n( '%d spam submission stopped so far.', '%d spam submissions stopped so far.', $blocked, 'salado-custom-carts' ) ),
+						(int) $blocked
+					);
+					echo '</strong> ';
+					esc_html_e( 'Anything it was unsure about is held as a draft under Quote Requests rather than deleted.', 'salado-custom-carts' );
+				}
+				?>
+			</p>
+			<table class="form-table" role="presentation">
+				<?php foreach ( scc_spam_settings_fields() as $key => $field ) : ?>
+					<tr>
+						<th scope="row">
+							<label for="scc_<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
+						</th>
+						<td>
+							<input
+								type="text"
+								class="regular-text"
+								id="scc_<?php echo esc_attr( $key ); ?>"
+								name="scc_<?php echo esc_attr( $key ); ?>"
+								value="<?php echo esc_attr( (string) get_option( 'scc_' . $key, '' ) ); ?>" />
 							<?php if ( $field['hint'] ) : ?>
 								<p class="description"><?php echo esc_html( $field['hint'] ); ?></p>
 							<?php endif; ?>

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SCC_VERSION', '1.3.1' );
+define( 'SCC_VERSION', '1.4.0' );
 
 /**
  * Business details live in one place so they can be changed once and update
@@ -160,6 +160,7 @@ require_once get_template_directory() . '/inc/shortcodes.php';
 require_once get_template_directory() . '/inc/settings.php';
 require_once get_template_directory() . '/inc/patterns.php';
 require_once get_template_directory() . '/inc/page-aside.php';
+require_once get_template_directory() . '/inc/antispam.php';
 require_once get_template_directory() . '/inc/quote-form.php';
 
 /**
