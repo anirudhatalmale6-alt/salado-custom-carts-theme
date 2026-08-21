@@ -85,14 +85,31 @@ The form blocks the obvious junk on its own the moment the theme is active -
 nothing to switch on, no keys needed. Two hidden traps, a check on how fast the
 form was filled in, a limit per address, and a read of the wording.
 
-To add a proper CAPTCHA on top:
+If you want a visible check on top of that, there are two options and you only
+need one of them. Both live at **Settings > Salado Details > Spam protection**.
+
+**Option A - the built-in question (no account with anybody).**
+Tick "Ask a simple question" and save. The form then asks something like *"What is
+four plus three?"*. Customers can answer with digits or words, and stray spaces or
+a full stop are fine. The question changes on every page load and the answer is
+never written into the page, so it cannot simply be read out of the source.
+
+This is the recommended option. It needs no third party, sends nothing anywhere,
+and works on any host.
+
+**Option B - Cloudflare Turnstile (optional, stronger).**
+Only worth it if the junk keeps coming and it is clearly a bot rather than a
+person being paid to fill forms in.
 
 1. Go to dash.cloudflare.com and sign in (a free account is enough - your site
    does NOT have to be on Cloudflare).
 2. Turnstile > Add site. Put `saladocustomcarts.com` in the domain box.
 3. Copy the two keys it gives you.
-4. In WordPress: Settings > Salado Details > Spam protection. Paste them in and
-   save. The CAPTCHA only switches on once BOTH boxes are filled.
+4. Paste them into the same settings screen and save. It only switches on once
+   BOTH boxes are filled.
+
+If both are switched on, Turnstile is used and the question hides itself, so
+nobody is ever asked twice.
 
 Nothing is deleted behind your back. Anything the filter is unsure about is
 saved as a **draft** under Quote Requests, marked with the reason, and simply not
@@ -100,8 +117,13 @@ emailed to you. If one turns out to be a real customer, open it and hit Publish.
 Only a hidden-trap hit is thrown away outright, and no human being can trigger
 one of those.
 
-If Cloudflare is ever unreachable, the form lets the enquiry through and marks
-it, rather than turning your phone off for the length of someone else's outage.
+If you do use Turnstile and Cloudflare is ever unreachable, the form lets the
+enquiry through and marks it, rather than turning your phone off for the length
+of someone else's outage.
+
+Honest limitation: the built-in question is weaker than Turnstile against a bot
+written specifically for your site. Against the volume junk you are getting it is
+plenty, because the hidden layers above do most of the work already.
 
 ## Notes
 

@@ -354,7 +354,11 @@ function scc_quote_form_shortcode( $atts ) {
 			</p>
 		<?php elseif ( 'captcha' === $state ) : ?>
 			<p class="scc-quote__msg scc-quote__msg--bad">
-				<?php esc_html_e( 'Please tick the "I am human" box below and send it again. Your details are still here.', 'salado-custom-carts' ); ?>
+					<?php if ( function_exists( 'scc_builtin_captcha_active' ) && scc_builtin_captcha_active() && ! scc_turnstile_active() ) : ?>
+					<?php esc_html_e( 'That answer was not quite right. Please try the question below again - everything you typed is still here.', 'salado-custom-carts' ); ?>
+				<?php else : ?>
+					<?php esc_html_e( 'Please tick the "I am human" box below and send it again. Your details are still here.', 'salado-custom-carts' ); ?>
+				<?php endif; ?>
 			</p>
 		<?php endif; ?>
 

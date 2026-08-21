@@ -13,9 +13,14 @@
  *   1. Honeypots      - two of them, one with a believable name.
  *   2. Timing         - a signed timestamp. Bots post instantly.
  *   3. Rate limit     - one address cannot send all afternoon.
- *   4. Turnstile      - a real CAPTCHA, once Andrew adds his keys.
+ *   4. A question     - built in, no account with anybody. Optional.
+ *   5. Turnstile      - a stronger CAPTCHA, if Andrew ever wants it. Optional.
  *
  * Plus content scoring, which flags rather than deletes.
+ *
+ * Layers 1-3 and the scoring are always on and need no configuration at all.
+ * Andrew asked on 21 Aug 2026 whether he really needs a Cloudflare account: he
+ * does not, which is why layer 4 exists.
  *
  * NOTHING IS EVER SILENTLY DELETED except a honeypot hit, which no human can
  * trigger. Everything else that looks like spam is still saved, marked, and
@@ -92,6 +97,91 @@ function scc_turnstile_verify( $token, $ip ) {
 }
 
 /**
+ * The built-in question. Needs no account with Cloudflare, Google or anyone
+ * else, sends nothing to a third party, and works on any host.
+ *
+ * Weaker than Turnstile against a bot written specifically for this one site,
+ * and I have told Andrew so. Against the volume junk he is actually getting it
+ * is plenty, because the layers above it do most of the work already.
+ */
+function scc_builtin_captcha_active() {
+	return '1' === (string) get_option( 'scc_builtin_captcha', '' );
+}
+
+/**
+ * Small numbers, spelled out, so the sum cannot be read straight out of the
+ * page source with a regular expression looking for digits.
+ */
+function scc_captcha_question() {
+	$words = array( 1 => 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine' );
+
+	// The full 1-9 by 1-9 range, so the answer is one of seventeen rather than
+	// one of a handful a bot could simply try in turn.
+	$a = wp_rand( 1, 9 );
+	$b = wp_rand( 1, 9 );
+
+	return array(
+		/* translators: 1: a number spelled out, 2: a number spelled out */
+		'text'   => sprintf( __( 'What is %1$s plus %2$s?', 'salado-custom-carts' ), $words[ $a ], $words[ $b ] ),
+		'answer' => (string) ( $a + $b ),
+	);
+}
+
+/**
+ * People type "7", "seven", " Seven." and all of them are right.
+ */
+function scc_normalise_answer( $raw ) {
+	$words = array(
+		'one' => '1', 'two' => '2', 'three' => '3', 'four' => '4', 'five' => '5',
+		'six' => '6', 'seven' => '7', 'eight' => '8', 'nine' => '9', 'ten' => '10',
+		'eleven' => '11', 'twelve' => '12', 'thirteen' => '13', 'fourteen' => '14',
+		'fifteen' => '15', 'sixteen' => '16', 'seventeen' => '17', 'eighteen' => '18',
+	);
+
+	$clean = strtolower( trim( (string) $raw ) );
+	$clean = preg_replace( '/[^a-z0-9]/', '', $clean );
+
+	return isset( $words[ $clean ] ) ? $words[ $clean ] : $clean;
+}
+
+/**
+ * The expected answer travels with the form as a salted hash, never as the
+ * answer itself. wp_hash() mixes in this site's own secret salt, so the hash
+ * cannot be worked backwards from a table of md5(1) to md5(18).
+ *
+ * The day number is mixed in as well. Without it, one solved pair of
+ * answer-and-hash would be worth replaying forever; this way anything harvested
+ * is dead within a day.
+ */
+function scc_captcha_hash( $answer, $day = null ) {
+	if ( null === $day ) {
+		$day = (int) floor( time() / DAY_IN_SECONDS );
+	}
+
+	return wp_hash( scc_normalise_answer( $answer ) . '|' . $day . '|scc_captcha' );
+}
+
+function scc_builtin_captcha_passed() {
+	if ( empty( $_POST['scc_c'] ) || ! isset( $_POST['scc_answer'] ) ) {
+		return false;
+	}
+
+	$expected = sanitize_text_field( wp_unslash( $_POST['scc_c'] ) );
+	$answer   = wp_unslash( $_POST['scc_answer'] );
+	$today    = (int) floor( time() / DAY_IN_SECONDS );
+
+	// Yesterday's key is accepted too, otherwise a form opened at ten to
+	// midnight would bounce a perfectly correct answer.
+	foreach ( array( $today, $today - 1 ) as $day ) {
+		if ( hash_equals( scc_captcha_hash( $answer, $day ), $expected ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * The widget itself, plus the two honeypots and the signed timestamp.
  */
 function scc_antispam_fields() {
@@ -107,6 +197,17 @@ function scc_antispam_fields() {
 
 	<?php /* Signed, so the clock cannot simply be edited in the page source. */ ?>
 	<input type="hidden" name="scc_t" value="<?php echo esc_attr( $stamp . '|' . wp_hash( $stamp . 'scc_quote' ) ); ?>" />
+
+	<?php if ( scc_builtin_captcha_active() && ! scc_turnstile_active() ) : ?>
+		<?php $question = scc_captcha_question(); ?>
+		<div class="scc-quote__field scc-quote__question">
+			<label for="scc-f-answer"><?php echo esc_html( $question['text'] ); ?></label>
+			<input type="text" id="scc-f-answer" name="scc_answer" value=""
+				inputmode="numeric" autocomplete="off" required />
+			<p class="scc-quote__hint"><?php esc_html_e( 'Just checking you are a person - digits or words are both fine.', 'salado-custom-carts' ); ?></p>
+		</div>
+		<input type="hidden" name="scc_c" value="<?php echo esc_attr( scc_captcha_hash( $question['answer'] ) ); ?>" />
+	<?php endif; ?>
 
 	<?php if ( scc_turnstile_active() ) : ?>
 		<?php $keys = scc_turnstile_keys(); ?>
@@ -290,6 +391,11 @@ function scc_screen_submission( $values ) {
 	}
 
 	$ip = scc_visitor_ip();
+
+	// Turnstile wins if both are switched on, so a visitor is never asked twice.
+	if ( scc_builtin_captcha_active() && ! scc_turnstile_active() && ! scc_builtin_captcha_passed() ) {
+		return array( 'action' => 'block', 'reason' => 'question-wrong' );
+	}
 
 	if ( scc_turnstile_active() ) {
 		$token  = isset( $_POST['cf-turnstile-response'] ) ? sanitize_text_field( wp_unslash( $_POST['cf-turnstile-response'] ) ) : '';

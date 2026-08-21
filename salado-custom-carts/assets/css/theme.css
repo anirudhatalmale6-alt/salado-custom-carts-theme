@@ -864,6 +864,9 @@ p { margin: 0 0 1.1em; }
 .scc-quote__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .scc-quote__captcha { grid-column: 1 / -1; margin: 0.25rem 0 0.5rem; }
 .scc-quote__captcha .cf-turnstile { min-height: 65px; }
+/* The built-in question. Deliberately looks like an ordinary field rather than
+   a security control - it reads as one more thing to fill in, not a hurdle. */
+.scc-quote__question input { max-width: 10rem; }
 .scc-quote__actions { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
 .scc-quote__alt { margin: 0; color: var(--scc-on-light-muted); }
 

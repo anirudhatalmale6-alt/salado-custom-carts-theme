@@ -55,6 +55,19 @@ function scc_register_settings() {
 			'default'           => '',
 		) );
 	}
+	register_setting( 'scc_details', 'scc_builtin_captcha', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'scc_sanitise_checkbox',
+		'default'           => '',
+	) );
+}
+
+/**
+ * An unticked checkbox posts nothing at all, so anything that is not exactly
+ * '1' means off.
+ */
+function scc_sanitise_checkbox( $value ) {
+	return '1' === (string) $value ? '1' : '';
 }
 add_action( 'admin_init', 'scc_register_settings' );
 
@@ -99,7 +112,7 @@ function scc_settings_page_render() {
 
 			<h2><?php esc_html_e( 'Spam protection', 'salado-custom-carts' ); ?></h2>
 			<p>
-				<?php esc_html_e( 'The quote form always blocks the obvious junk on its own. Adding the two keys below turns on a proper CAPTCHA as well.', 'salado-custom-carts' ); ?>
+				<?php esc_html_e( 'The quote form already blocks the obvious junk on its own, with nothing switched on below. The options here add a visible check on top of that.', 'salado-custom-carts' ); ?>
 				<?php
 				$blocked = (int) get_option( 'scc_spam_blocked', 0 );
 				if ( $blocked > 0 ) {
@@ -113,6 +126,26 @@ function scc_settings_page_render() {
 					esc_html_e( 'Anything it was unsure about is held as a draft under Quote Requests rather than deleted.', 'salado-custom-carts' );
 				}
 				?>
+			</p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Ask a simple question', 'salado-custom-carts' ); ?></th>
+					<td>
+						<label for="scc_builtin_captcha">
+							<input type="checkbox" id="scc_builtin_captcha" name="scc_builtin_captcha" value="1"
+								<?php checked( '1', (string) get_option( 'scc_builtin_captcha', '' ) ); ?> />
+							<?php esc_html_e( 'Add a one-line question to the quote form, e.g. "What is four plus three?"', 'salado-custom-carts' ); ?>
+						</label>
+						<p class="description">
+							<?php esc_html_e( 'No account with anyone, nothing sent to a third party, works on any host. This is the simplest option and it is switched on and off right here.', 'salado-custom-carts' ); ?>
+						</p>
+					</td>
+				</tr>
+			</table>
+
+			<h3><?php esc_html_e( 'Optional: Cloudflare Turnstile', 'salado-custom-carts' ); ?></h3>
+			<p class="description">
+				<?php esc_html_e( 'You do not need this. It is a stronger CAPTCHA than the question above, but it needs a free Cloudflare account. Leave both boxes empty to skip it entirely. If you do fill them in, Turnstile is used and the question above is hidden, so nobody is asked twice.', 'salado-custom-carts' ); ?>
 			</p>
 			<table class="form-table" role="presentation">
 				<?php foreach ( scc_spam_settings_fields() as $key => $field ) : ?>
